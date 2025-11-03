@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CHT Reports Viewer</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script defer src="app.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    #output { white-space: pre-wrap; background: #f4f4f4; padding: 15px; border-radius: 5px; margin-top: 10px; }
+    .nav { margin-top: 10px; }
+    .nav a { margin: 0 5px; cursor: pointer; }
+    .buttons { margin-bottom: 20px; }
+    button { margin-right: 10px; padding: 10px 15px; cursor: pointer; }
+    select { padding: 5px; }
+  </style>
+</head>
+<body>
+
+<h1>CHT Reports Viewer</h1>
+
+<div class="buttons">
+  <button onclick="downloadReports('contact')">Download Contact Reports</button>
+  <button onclick="downloadReports('become')">Download Become Reports</button>
+  <button onclick="downloadReports('become_condition')">Download Become Condition Reports</button>
+</div>
+
+<label for="reportType">Select Report Type:</label>
+<select id="reportType" onchange="loadReports()">
+  <option value="contact">Contact</option>
+  <option value="become">Become</option>
+  <option value="become_condition">Become Condition</option>
+</select>
+
+<h2>Total Number of Reports: <span id="total-count">Loading...</span></h2>
+
+<h3>Paginated Data</h3>
+<div id="output">Loading data...</div>
+<div class="nav" id="pagination"></div>
+
+<script>
+const pageSize = 10;
+let currentPage = 1;
+let reports = [];
+
+async function loadReports() {
+  const type = document.getElementById('reportType').value;
+  document.getElementById('output').innerText = "Loading data...";
+  try {
+    const response = await axios.get(`/download/${type}`);
+    // The server returns CSV, parse it manually
+    const csvText = response.data;
+    reports = csvText.split('\n').slice(1).map(row => row.split(','));
+    document.getElementById('total-count').innerText = reports.length;
+    currentPage = 1;
+    renderPage();
+  } catch (err) {
+    console.error(err);
+    document.getElementById('output').innerText = "Error loading reports.";
+    document.getElementById('total-count').innerText = 0;
+  }
+}
+
+function renderPage() {
+  const start = (currentPage - 1) * pageSize;
+  const end = start + pageSize;
+  const pageData = reports.slice(start, end);
+  document.getElementById('output').innerText = pageData.map(r => r.join(', ')).join('\n');
+
+  const totalPages = Math.ceil(reports.length / pageSize);
+  const pagination = document.getElementById('pagination');
+  pagination.innerHTML = '';
+  for (let i = 1; i <= totalPages; i++) {
+    const link = document.createElement('a');
+    link.innerText = i;
+    link.onclick = () => { currentPage = i; renderPage(); };
+    if (i === currentPage) link.style.fontWeight = 'bold';
+    pagination.appendChild(link);
+  }
+}
+
+// Download CSV
+function downloadReports(type) {
+  window.location.href = `/download/${type}`;
+}
+
+// Initial load
+loadReports();
+</script>
+
+</body>
+</html>
