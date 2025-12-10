@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <title>CHT Reports Viewer</title>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script defer src="app.js"></script>
+  <link rel="stylesheet" href="/css/styles.css">
+  <script defer src="/js/main.js"></script>
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; }
     #output { white-space: pre-wrap; background: #f4f4f4; padding: 15px; border-radius: 5px; margin-top: 10px; }
@@ -25,6 +26,14 @@
   <button onclick="downloadReports('become_condition')">Download Become Condition Reports</button>
 </div>
 
+<div class="filters">
+  <label for="startDate">Start Date:</label>
+  <input type="date" id="startDate">
+  <label for="endDate">End Date:</label>
+  <input type="date" id="endDate">
+  <button onclick="loadReports()">Apply Filter</button>
+</div>
+
 <label for="reportType">Select Report Type:</label>
 <select id="reportType" onchange="loadReports()">
   <option value="contact">Contact</option>
@@ -32,61 +41,33 @@
   <option value="become_condition">Become Condition</option>
 </select>
 
-<h2>Total Number of Reports: <span id="total-count">Loading...</span></h2>
+<div class="summary">
+  <h2>Total Reports: <span id="total-count">Loading...</span></h2>
+</div>
 
-<h3>Paginated Data</h3>
-<div id="output">Loading data...</div>
-<div class="nav" id="pagination"></div>
-
-<script>
-const pageSize = 10;
-let currentPage = 1;
-let reports = [];
-
-async function loadReports() {
-  const type = document.getElementById('reportType').value;
-  document.getElementById('output').innerText = "Loading data...";
-  try {
-    const response = await axios.get(`/download/${type}`);
-    // The server returns CSV, parse it manually
-    const csvText = response.data;
-    reports = csvText.split('\n').slice(1).map(row => row.split(','));
-    document.getElementById('total-count').innerText = reports.length;
-    currentPage = 1;
-    renderPage();
-  } catch (err) {
-    console.error(err);
-    document.getElementById('output').innerText = "Error loading reports.";
-    document.getElementById('total-count').innerText = 0;
-  }
-}
-
-function renderPage() {
-  const start = (currentPage - 1) * pageSize;
-  const end = start + pageSize;
-  const pageData = reports.slice(start, end);
-  document.getElementById('output').innerText = pageData.map(r => r.join(', ')).join('\n');
-
-  const totalPages = Math.ceil(reports.length / pageSize);
-  const pagination = document.getElementById('pagination');
-  pagination.innerHTML = '';
-  for (let i = 1; i <= totalPages; i++) {
-    const link = document.createElement('a');
-    link.innerText = i;
-    link.onclick = () => { currentPage = i; renderPage(); };
-    if (i === currentPage) link.style.fontWeight = 'bold';
-    pagination.appendChild(link);
-  }
-}
-
-// Download CSV
-function downloadReports(type) {
-  window.location.href = `/download/${type}`;
-}
-
-// Initial load
-loadReports();
-</script>
+<div class="table-card">
+  <div class="table-header">
+    <h3>Paginated Data</h3>
+    <div id="status" class="status">Loading data...</div>
+  </div>
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Form</th>
+          <th>Reported Date</th>
+          <th>Name</th>
+          <th>Facility</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <tr><td colspan="5">Loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="nav" id="pagination"></div>
+</div>
 
 </body>
 </html>
