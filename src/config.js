@@ -1,15 +1,12 @@
 const COUCHDB_VIEWS = {
-  contact:
-    "https://chnbecome.sambhavpossible.org/medic/_design/medic-forms/_view/contact?include_docs=true",
-  become:
-    "https://chnbecome.sambhavpossible.org/medic/_design/medic-forms/_view/become?include_docs=true",
-  become_condition:
-    "https://chnbecome.sambhavpossible.org/medic/_design/medic-forms/_view/become_condition?include_docs=true",
+  contact: process.env.COUCHDB_VIEW_CONTACT,
+  become: process.env.COUCHDB_VIEW_BECOME,
+  become_condition: process.env.COUCHDB_VIEW_BECOME_CONDITION,
 };
 
 const COUCHDB_AUTH = {
-  username: "medic",
-  password: "consul-boilers-hold-lapping-Sargon-diffusing-rarefy",
+  username: process.env.COUCHDB_USERNAME,
+  password: process.env.COUCHDB_PASSWORD,
 };
 
 module.exports = {
