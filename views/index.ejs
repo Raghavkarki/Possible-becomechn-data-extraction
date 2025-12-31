@@ -6,44 +6,38 @@
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <link rel="stylesheet" href="/css/styles.css">
   <script defer src="/js/main.js"></script>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    #output { white-space: pre-wrap; background: #f4f4f4; padding: 15px; border-radius: 5px; margin-top: 10px; }
-    .nav { margin-top: 10px; }
-    .nav a { margin: 0 5px; cursor: pointer; }
-    .buttons { margin-bottom: 20px; }
-    button { margin-right: 10px; padding: 10px 15px; cursor: pointer; }
-    select { padding: 5px; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
+<div class="container">
+  <h1>CHT Reports Viewer</h1>
 
-<h1>CHT Reports Viewer</h1>
+  <div class="buttons">
+    <button onclick="downloadReports('contact')">📥 Download Contact Reports</button>
+    <button onclick="downloadReports('become')">📥 Download Become Reports</button>
+    <button onclick="downloadReports('become_condition')">📥 Download Become Condition Reports</button>
+  </div>
 
-<div class="buttons">
-  <button onclick="downloadReports('contact')">Download Contact Reports</button>
-  <button onclick="downloadReports('become')">Download Become Reports</button>
-  <button onclick="downloadReports('become_condition')">Download Become Condition Reports</button>
-</div>
+  <div class="filters">
+    <label for="reportType">Report Type:</label>
+    <select id="reportType" onchange="loadReports()">
+      <option value="contact">Contact</option>
+      <option value="become" selected>Become</option>
+      <option value="become_condition">Become Condition</option>
+    </select>
+    
+    <label for="startDate">Start Date:</label>
+    <input type="date" id="startDate">
+    
+    <label for="endDate">End Date:</label>
+    <input type="date" id="endDate">
+    
+    <button onclick="loadReports()">🔍 Apply Filter</button>
+  </div>
 
-<div class="filters">
-  <label for="startDate">Start Date:</label>
-  <input type="date" id="startDate">
-  <label for="endDate">End Date:</label>
-  <input type="date" id="endDate">
-  <button onclick="loadReports()">Apply Filter</button>
-</div>
-
-<label for="reportType">Select Report Type:</label>
-<select id="reportType" onchange="loadReports()">
-  <option value="contact">Contact</option>
-  <option value="become">Become</option>
-  <option value="become_condition">Become Condition</option>
-</select>
-
-<div class="summary">
-  <h2>Total Reports: <span id="total-count">Loading...</span></h2>
-</div>
+  <div class="summary">
+    <h2>Total Reports: <span id="total-count">Loading...</span></h2>
+  </div>
 
 <div class="table-card">
   <div class="table-header">
